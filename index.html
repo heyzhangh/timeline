@@ -81,35 +81,10 @@
   .strip-item{display:flex;gap:6px;align-items:baseline}
   .strip-label{color:var(--muted);font-weight:500}
 
-  /* Couple scenes (dynamic mode only; images come from encrypted data) */
-  .scene-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px;cursor:pointer}
-  .scene-stage{position:relative;height:172px;overflow:hidden}
-  .scene-stage .scene-bg{position:absolute;inset:0}
-  .scene-tv .scene-bg{background:linear-gradient(180deg,#f7e8d0 0%,#f3d9b8 100%)}
-  .scene-play .scene-bg{background:linear-gradient(180deg,#d9ecd2 0%,#c2dfb8 100%)}
-  .scene-study .scene-bg{background:linear-gradient(180deg,#dbe7f5 0%,#c3d6ee 100%)}
-  .scene-hike .scene-bg{background:linear-gradient(180deg,#cfe5f7 0%,#e8f0e4 100%)}
-  .scene-shape{position:absolute}
-  .scene-tv .tv{left:50%;top:18px;transform:translateX(-50%);width:120px;height:74px;background:#2b3440;border-radius:10px;border:6px solid #1f2733}
-  .scene-tv .tv:after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:14px solid #ff8a5c;border-top:10px solid transparent;border-bottom:10px solid transparent}
-  .scene-tv .sofa{left:50%;bottom:22px;transform:translateX(-50%);width:230px;height:34px;background:#e07856;border-radius:16px 16px 8px 8px}
-  .scene-play .ball{right:16%;bottom:30px;width:44px;height:44px;border-radius:50%;background:#ff8a5c}
-  .scene-play .grass{left:0;right:0;bottom:0;height:26px;background:#9ccb8f}
-  .scene-study .desk{left:50%;bottom:34px;transform:translateX(-50%);width:250px;height:12px;background:#b08a5e;border-radius:6px}
-  .scene-study .laptop{left:50%;top:34px;transform:translateX(-50%);width:110px;height:70px;background:#2b3440;border-radius:8px}
-  .scene-hike .mtn1{left:-10px;bottom:0;width:0;height:0;border-left:150px solid transparent;border-right:150px solid transparent;border-bottom:130px solid #7fa8a0}
-  .scene-hike .mtn2{right:-20px;bottom:0;width:0;height:0;border-left:170px solid transparent;border-right:170px solid transparent;border-bottom:150px solid #5d8a80}
-  .scene-fig{position:absolute;bottom:10px;height:140px;z-index:2;animation:bob 3s ease-in-out infinite alternate}
-  .scene-fig.her{left:16%}
-  .scene-fig.him{right:16%}
-  .scene-hike .scene-fig{animation:climb 9s linear infinite}
-  @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-5px)}}
-  @keyframes climb{0%{transform:translateY(26px);opacity:0}10%{opacity:1}80%{transform:translateY(-28px);opacity:1}95%{opacity:0}100%{transform:translateY(26px);opacity:0}}
-  .scene-cap{text-align:center;font-size:13.5px;font-weight:700;padding:10px 12px 2px}
-  .scene-dots{display:flex;justify-content:center;gap:8px;padding:8px 0 12px}
-  .scene-dot{width:8px;height:8px;border-radius:50%;border:none;background:var(--border-strong);cursor:pointer;padding:0}
-  .scene-dot.active{background:var(--blue);width:20px;border-radius:999px}
-  @media(prefers-reduced-motion:reduce){.scene-fig{animation:none}}
+  /* Title figure (static accent beside the title; cutout, no box, no caption) */
+  .title-row{display:flex;align-items:flex-end;gap:14px}
+  .title-figure{height:150px;width:auto;flex:none}
+  @media(max-width:600px){.title-figure{height:110px}}
   .notes-body{padding:4px 16px 16px}
   .note-item{padding:12px 0;border-bottom:1px solid var(--border)}
   .note-item:last-child{border-bottom:none}
@@ -275,7 +250,9 @@
 
     var html = '';
     // Header
-    html += '<div class="topbar"><div><h1>'+esc(meta.title)+'</h1><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
+    html += '<div class="topbar"><div><div class="title-row"><h1>'+esc(meta.title)+'</h1>';
+    if(meta.titleFigure){ html += '<img class="title-figure" src="'+esc(meta.titleFigure)+'" alt="">'; }
+    html += '</div><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
     if(meta.dataAsOf){
       html += '<div class="snapshot"><i></i>'+esc(meta.snapshotLabel)+' <span>· '+esc(fmtCN(meta.dataAsOf))+'</span></div>';
     }
@@ -516,28 +493,13 @@
 
     var html = '';
     // Header
-    html += '<div class="topbar"><div><h1>'+esc(meta.title)+'</h1><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
+    html += '<div class="topbar"><div><div class="title-row"><h1>'+esc(meta.title)+'</h1>';
+    if(meta.titleFigure){ html += '<img class="title-figure" src="'+esc(meta.titleFigure)+'" alt="">'; }
+    html += '</div><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
     if(meta.dataAsOf){
       html += '<div class="snapshot"><i></i>'+esc(meta.snapshotLabel)+' <span>· '+esc(fmtCN(meta.dataAsOf))+'</span></div>';
     }
     html += '</div>';
-    // Couple scenes (only when the payload carries them).
-    if(meta.couple && meta.couple.her && meta.couple.him && meta.couple.scenes && meta.couple.scenes.length){
-      var cs = meta.couple.scenes;
-      var ci = (typeof SCENE_IDX === 'number' && SCENE_IDX < cs.length) ? SCENE_IDX : 0;
-      var sc0 = cs[ci];
-      var her0 = (sc0.set === 'hike' && meta.couple.hikeHer) ? meta.couple.hikeHer : meta.couple.her;
-      var him0 = (sc0.set === 'hike' && meta.couple.hikeHim) ? meta.couple.hikeHim : meta.couple.him;
-      html += '<div class="scene-card" id="sceneCard"><div class="scene-stage scene-'+esc(sc0.type)+'" id="sceneStage"><div class="scene-bg"></div>'
-        + sceneShapesHTML(sc0.type)
-        + '<img class="scene-fig her" src="'+esc(her0)+'" alt="">'
-        + '<img class="scene-fig him" src="'+esc(him0)+'" alt="">'
-        + '</div><div class="scene-cap" id="sceneCap">'+esc(sc0.caption)+'</div><div class="scene-dots" id="sceneDots">';
-      for(var si = 0; si < cs.length; si++){
-        html += '<button class="scene-dot'+(si===ci?' active':'')+'" data-i="'+si+'" aria-label="场景'+(si+1)+'"></button>';
-      }
-      html += '</div></div>';
-    }
     // Status strip: today / in-progress / next milestone (dynamic only).
     var doingNames = [];
     allRows.forEach(function(r){
@@ -670,54 +632,10 @@
         btn.onclick = function(){ renderAll(parseInt(btn.getAttribute('data-s'), 10)); };
       })(btns[b]);
     }
-    // Couple scenes: tap to switch, auto-rotate every 5s (local DOM only).
-    (function(){
-      var card = document.getElementById('sceneCard');
-      if(!card || !P_META || !P_META.couple || !P_META.couple.scenes) return;
-      var scenes = P_META.couple.scenes;
-      var stage = document.getElementById('sceneStage');
-      var capEl = document.getElementById('sceneCap');
-      var dots = document.querySelectorAll('#sceneDots .scene-dot');
-      function figSrc(sc, side){
-        if(sc.set === 'hike' && P_META.couple[side === 'her' ? 'hikeHer' : 'hikeHim']) return P_META.couple[side === 'her' ? 'hikeHer' : 'hikeHim'];
-        return P_META.couple[side];
-      }
-      function showScene(i){
-        SCENE_IDX = i;
-        var sc = scenes[i];
-        stage.className = 'scene-stage scene-' + sc.type;
-        stage.innerHTML = '<div class="scene-bg"></div>' + sceneShapesHTML(sc.type)
-          + '<img class="scene-fig her" src="' + figSrc(sc, 'her') + '" alt="">'
-          + '<img class="scene-fig him" src="' + figSrc(sc, 'him') + '" alt="">';
-        capEl.textContent = sc.caption;
-        for(var d = 0; d < dots.length; d++) dots[d].className = 'scene-dot' + (d === i ? ' active' : '');
-        restartTimer();
-      }
-      function restartTimer(){
-        if(SCENE_TIMER) clearTimeout(SCENE_TIMER);
-        if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        SCENE_TIMER = setTimeout(function(){ showScene((SCENE_IDX + 1) % scenes.length); }, 5000);
-      }
-      for(var b = 0; b < dots.length; b++){
-        (function(btn){
-          btn.onclick = function(e){ e.stopPropagation(); showScene(parseInt(btn.getAttribute('data-i'), 10)); };
-        })(dots[b]);
-      }
-      card.onclick = function(){ showScene((SCENE_IDX + 1) % scenes.length); };
-      restartTimer();
-    })();
   }
 
 
-  function sceneShapesHTML(type){
-    if(type === 'tv') return '<div class="scene-shape tv"></div><div class="scene-shape sofa"></div>';
-    if(type === 'play') return '<div class="scene-shape grass"></div><div class="scene-shape ball"></div>';
-    if(type === 'study') return '<div class="scene-shape laptop"></div><div class="scene-shape desk"></div>';
-    if(type === 'hike') return '<div class="scene-shape mtn1"></div><div class="scene-shape mtn2"></div>';
-    return '';
-  }
-
-  var P_META = null, P_TASKS = null, P_EXAM = null, SCENE_IDX = 0, SCENE_TIMER = null;
+  var P_META = null, P_TASKS = null, P_EXAM = null;
   function renderAll(scenario){
     var sc = document.querySelector('.scroll');
     var sx = sc ? sc.scrollLeft : 0;
