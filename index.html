@@ -77,7 +77,9 @@
   .scenario-note{color:var(--muted);font-weight:500}
   .exam-switch{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
   .exam-switch .sc-btn{font-size:12px;padding:4px 11px}
-  .strip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:600}
+  .strip{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:600}
+  .strip-item{display:flex;gap:6px;align-items:baseline}
+  .strip-label{color:var(--muted);font-weight:500}
   .notes-body{padding:4px 16px 16px}
   .note-item{padding:12px 0;border-bottom:1px solid var(--border)}
   .note-item:last-child{border-bottom:none}
@@ -248,14 +250,6 @@
       html += '<div class="snapshot"><i></i>'+esc(meta.snapshotLabel)+' <span>· '+esc(fmtCN(meta.dataAsOf))+'</span></div>';
     }
     html += '</div>';
-    // Key cards
-    if(meta.keys && meta.keys.length){
-      html += '<div class="keys">';
-      meta.keys.forEach(function(k){
-        html += '<div class="key"><div class="num">'+esc(k.num)+'</div><b>'+esc(k.title)+'</b><p>'+esc(k.text)+'</p></div>';
-      });
-      html += '</div>';
-    }
     // Legend
     html += '<div class="legend">';
     sections.forEach(function(sec){
@@ -506,22 +500,16 @@
     allRows.forEach(function(r){
       if(r.start >= todayIso && (!nextRow || r.start < nextRow.start)) nextRow = r;
     });
-    var stripHtml = '今天 ' + esc(fmtCN(todayIso)) + ' · 进行中：' + esc(doingNames.length ? doingNames.join('、') : '暂无') + ' · 下一个：';
+    var nextHtml = '暂无';
     if(nextRow){
       var ndays = dayDiff(today, parseDate(nextRow.start));
-      stripHtml += esc(nextRow.name) + ' ' + esc(fmtCN(nextRow.start)) + '（' + (ndays === 0 ? '今天' : ndays + ' 天后') + '）';
-    } else {
-      stripHtml += '暂无';
+      nextHtml = esc(nextRow.name) + ' ' + esc(fmtCN(nextRow.start)) + '（' + (ndays === 0 ? '今天' : ndays + ' 天后') + '）';
     }
-    html += '<div class="strip">' + stripHtml + '</div>';
-    // Key cards
-    if(meta.keys && meta.keys.length){
-      html += '<div class="keys">';
-      meta.keys.forEach(function(k){
-        html += '<div class="key"><div class="num">'+esc(k.num)+'</div><b>'+esc(k.title)+'</b><p>'+esc(k.text)+'</p></div>';
-      });
-      html += '</div>';
-    }
+    html += '<div class="strip">'
+      + '<div class="strip-item"><span class="strip-label">今天</span><span>' + esc(fmtCN(todayIso)) + '</span></div>'
+      + '<div class="strip-item"><span class="strip-label">进行中</span><span>' + esc(doingNames.length ? doingNames.join('、') : '暂无') + '</span></div>'
+      + '<div class="strip-item"><span class="strip-label">下一个</span><span>' + nextHtml + '</span></div>'
+      + '</div>';
     // Legend: colors encode STATUS now, not sections.
     html += '<div class="legend">';
     [['todo', SL.todo || '待办'], ['doing', SL.doing || '进行中'], ['done', SL.done || '已完成'], ['overdue', OVER_LABEL]].forEach(function(pair){
