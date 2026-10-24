@@ -533,7 +533,7 @@
     // Scenario switcher (preview only).
     html += '<div class="scenario"><span class="scenario-label">'+esc(meta.scenarioLabel || '假设第几次通过')+'</span>';
     for(var i = 1; i <= exam.exams.length; i++){
-      var lbl = i <= CNT.length ? CNT[i-1]+'次通过' : '第'+i+'次通过';
+      var lbl = exam.exams[i-1].label || (i <= CNT.length ? CNT[i-1]+'次通过' : '第'+i+'次通过');
       html += '<button class="sc-btn'+(i===S?' active':'')+'" data-s="'+i+'">'+esc(lbl)+'</button>';
     }
     html += '<span class="scenario-note">当前显示：第 '+S+' 次通过的情形 · '+esc(meta.scenarioHint || '切换只影响本次查看')+'</span></div>';
