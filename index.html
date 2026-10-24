@@ -75,6 +75,12 @@
   .sc-btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
   .sc-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
   .scenario-note{color:var(--muted);font-weight:500}
+  .strip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:600}
+  .notes-body{padding:4px 16px 16px}
+  .note-item{padding:12px 0;border-bottom:1px solid var(--border)}
+  .note-item:last-child{border-bottom:none}
+  .note-item b{display:block;font-size:14px;margin-bottom:4px}
+  .note-item p{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
 
   /* Gantt card */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
@@ -109,11 +115,11 @@
 
   .row{display:grid;grid-template-columns:300px 1fr;border-bottom:1px solid var(--border)}
   .row:last-child{border-bottom:none}
-  .row-info{padding:12px 14px;border-right:1px solid var(--border);min-width:0}
+  .row-info{padding:10px 14px;border-right:1px solid var(--border);min-width:0}
   .row-title{font-size:14px;font-weight:700;line-height:1.35}
   .row-dates{font-size:12.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap}
   .row-note{font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:5px}
-  .row-track{position:relative;min-height:64px}
+  .row-track{position:relative;min-height:56px}
   .gridlines{position:absolute;inset:0;pointer-events:none}
   .gridlines i{position:absolute;top:0;bottom:0;width:1px;background:var(--border);opacity:.7}
   .bar{position:absolute;top:50%;transform:translateY(-50%);height:22px;border-radius:999px;display:flex;align-items:center;padding:0 10px;font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;min-width:22px}
@@ -489,6 +495,22 @@
       html += '<div class="snapshot"><i></i>'+esc(meta.snapshotLabel)+' <span>· '+esc(fmtCN(meta.dataAsOf))+'</span></div>';
     }
     html += '</div>';
+    // Status strip: today / in-progress / next milestone (dynamic only).
+    var doingNames = [];
+    allRows.forEach(function(r){
+      if(!r.gen && effStatus(r) === 'doing') doingNames.push(r.name);
+    });
+    var nextRow = null;
+    allRows.forEach(function(r){
+      if(r.start > todayIso && (!nextRow || r.start < nextRow.start)) nextRow = r;
+    });
+    var stripHtml = '今天 ' + esc(fmtCN(todayIso)) + ' · 进行中：' + esc(doingNames.length ? doingNames.join('、') : '暂无') + ' · 下一个：';
+    if(nextRow){
+      stripHtml += esc(nextRow.name) + ' ' + esc(fmtCN(nextRow.start)) + '（' + dayDiff(today, parseDate(nextRow.start)) + ' 天后）';
+    } else {
+      stripHtml += '暂无';
+    }
+    html += '<div class="strip">' + stripHtml + '</div>';
     // Key cards
     if(meta.keys && meta.keys.length){
       html += '<div class="keys">';
@@ -567,7 +589,7 @@
           html += '<div class="node-label" style="left:calc('+left+'% + 14px)">'+esc(fmtSlash(item.start))+'</div>';
         } else {
           if(width < 9){
-            html += '<div class="bar" style="left:'+left+'%;width:'+width+'%"></div><div class="bar-label-out" style="left:calc('+(left+width)+'% )">'+esc(item.name)+'</div>';
+            html += '<div class="bar" style="left:'+left+'%;width:'+width+'%;background:'+col+'"></div><div class="bar-label-out" style="left:calc('+(left+width)+'% )">'+esc(item.name)+'</div>';
           } else {
             html += '<div class="bar" style="left:'+left+'%;width:'+width+'%;background:'+col+'">'+(width>14?esc(item.name):'')+'</div>';
             if(width <= 14){ html += '<div class="bar-label-out" style="left:calc('+(left+width)+'% )">'+esc(item.name)+'</div>'; }
@@ -578,6 +600,14 @@
     });
     html += '</div></div></div>';
     html += '<div class="hint">'+esc(meta.hint)+'</div>';
+    if(meta.notes && meta.notes.length){
+      html += '<div class="card" style="margin-top:16px"><div class="card-head"><strong>'+esc(meta.notesTitle || '备注')+'</strong></div><div class="notes-body">';
+      meta.notes.forEach(function(nt){
+        html += '<div class="note-item"><b>'+esc(nt.title)+'</b><p>'+esc(nt.text)+'</p></div>';
+      });
+      html += '</div></div>';
+    }
+
     // Links card (only when the payload carries links)
     if(meta.links && meta.links.length){
       html += '<div class="card" style="margin-top:16px"><div class="card-head"><strong>'+esc(meta.linksTitle)+'</strong></div><ul class="links">';
