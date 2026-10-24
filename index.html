@@ -502,11 +502,12 @@
     });
     var nextRow = null;
     allRows.forEach(function(r){
-      if(r.start > todayIso && (!nextRow || r.start < nextRow.start)) nextRow = r;
+      if(r.start >= todayIso && (!nextRow || r.start < nextRow.start)) nextRow = r;
     });
     var stripHtml = '今天 ' + esc(fmtCN(todayIso)) + ' · 进行中：' + esc(doingNames.length ? doingNames.join('、') : '暂无') + ' · 下一个：';
     if(nextRow){
-      stripHtml += esc(nextRow.name) + ' ' + esc(fmtCN(nextRow.start)) + '（' + dayDiff(today, parseDate(nextRow.start)) + ' 天后）';
+      var ndays = dayDiff(today, parseDate(nextRow.start));
+      stripHtml += esc(nextRow.name) + ' ' + esc(fmtCN(nextRow.start)) + '（' + (ndays === 0 ? '今天' : ndays + ' 天后') + '）';
     } else {
       stripHtml += '暂无';
     }
@@ -524,7 +525,7 @@
     [['todo', SL.todo || '待办'], ['doing', SL.doing || '进行中'], ['done', SL.done || '已完成'], ['overdue', OVER_LABEL]].forEach(function(pair){
       html += '<div class="legend-item"><span class="swatch" style="background:'+colorFor(pair[0])+'"></span>'+esc(pair[1])+'</div>';
     });
-    html += '<div class="legend-item"><span class="diamond" style="background:'+C.doing+'"></span>'+esc(meta.legendNodeLabel)+'</div>';
+    html += '<div class="legend-item"><span class="diamond" style="background:transparent;border-color:var(--muted)"></span>'+esc(meta.legendNodeLabel)+'</div>';
     if(todayIn){
       html += '<div class="today-key"><span class="today-line-sample"></span>'+esc(meta.legendTodayLabel)+' · '+esc(fmtCN(todayIso))+'</div>';
     }
@@ -635,8 +636,14 @@
 
   var P_META = null, P_TASKS = null, P_EXAM = null;
   function renderAll(scenario){
+    var sc = document.querySelector('.scroll');
+    var sx = sc ? sc.scrollLeft : 0;
+    var sy = window.scrollY || 0;
     if(P_EXAM) renderDynamic(P_META, P_TASKS, P_EXAM, scenario);
     else renderLegacy(P_META, P_TASKS);
+    var sc2 = document.querySelector('.scroll');
+    if(sc2) sc2.scrollLeft = sx;
+    window.scrollTo(0, sy);
   }
 
   function load(pw, errEl){
