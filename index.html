@@ -43,7 +43,7 @@
   #err{color:var(--today);font-size:13px;min-height:18px;margin:10px 0 0}
 
   /* Header */
-  .topbar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+  .topbar{margin-bottom:16px;overflow:hidden}
   h1{font-size:28px;line-height:1.15;margin:6px 0 8px;letter-spacing:-.02em;font-weight:800}
   @media(min-width:768px){h1{font-size:34px}}
   .subtitle{font-size:15px;line-height:1.6;color:var(--muted);max-width:680px}
@@ -81,10 +81,10 @@
   .strip-item{display:flex;gap:6px;align-items:baseline}
   .strip-label{color:var(--muted);font-weight:500}
 
-  /* Title figure (static accent beside the title; cutout, no box, no caption) */
-  .title-row{display:flex;align-items:flex-end;gap:14px}
-  .title-figure{height:150px;width:auto;flex:none}
-  @media(max-width:600px){.title-figure{height:110px}}
+  /* Title figure (right-floated column: figure + snapshot; subtitle wraps around it) */
+  .topbar-right{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:10px;margin:6px 0 0 14px}
+  .title-figure{height:84px;width:auto;flex:none}
+  @media(max-width:600px){.title-figure{height:64px}}
   .notes-body{padding:4px 16px 16px}
   .note-item{padding:12px 0;border-bottom:1px solid var(--border)}
   .note-item:last-child{border-bottom:none}
@@ -250,13 +250,9 @@
 
     var html = '';
     // Header
-    html += '<div class="topbar"><div><div class="title-row"><h1>'+esc(meta.title)+'</h1>';
+    html += '<div class="topbar"><div class="topbar-right">';
     if(meta.titleFigure){ html += '<img class="title-figure" src="'+esc(meta.titleFigure)+'" alt="">'; }
-    html += '</div><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
-    if(meta.dataAsOf){
-      html += '<div class="snapshot"><i></i>'+esc(meta.snapshotLabel)+' <span>· '+esc(fmtCN(meta.dataAsOf))+'</span></div>';
-    }
-    html += '</div>';
+    html += '</div><h1>'+esc(meta.title)+'</h1><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
     // Legend
     html += '<div class="legend">';
     sections.forEach(function(sec){
@@ -493,13 +489,9 @@
 
     var html = '';
     // Header
-    html += '<div class="topbar"><div><div class="title-row"><h1>'+esc(meta.title)+'</h1>';
+    html += '<div class="topbar"><div class="topbar-right">';
     if(meta.titleFigure){ html += '<img class="title-figure" src="'+esc(meta.titleFigure)+'" alt="">'; }
-    html += '</div><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
-    if(meta.dataAsOf){
-      html += '<div class="snapshot"><i></i>'+esc(meta.snapshotLabel)+' <span>· '+esc(fmtCN(meta.dataAsOf))+'</span></div>';
-    }
-    html += '</div>';
+    html += '</div><h1>'+esc(meta.title)+'</h1><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
     // Status strip: today / in-progress / next milestone (dynamic only).
     var doingNames = [];
     allRows.forEach(function(r){
