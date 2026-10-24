@@ -75,6 +75,8 @@
   .sc-btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
   .sc-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
   .scenario-note{color:var(--muted);font-weight:500}
+  .exam-switch{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
+  .exam-switch .sc-btn{font-size:12px;padding:4px 11px}
   .strip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:600}
   .notes-body{padding:4px 16px 16px}
   .note-item{padding:12px 0;border-bottom:1px solid var(--border)}
@@ -530,13 +532,6 @@
       html += '<div class="today-key"><span class="today-line-sample"></span>'+esc(meta.legendTodayLabel)+' · '+esc(fmtCN(todayIso))+'</div>';
     }
     html += '</div>';
-    // Scenario switcher (preview only).
-    html += '<div class="scenario"><span class="scenario-label">'+esc(meta.scenarioLabel || '假设第几次通过')+'</span>';
-    for(var i = 1; i <= exam.exams.length; i++){
-      var lbl = exam.exams[i-1].label || (i <= CNT.length ? CNT[i-1]+'次通过' : '第'+i+'次通过');
-      html += '<button class="sc-btn'+(i===S?' active':'')+'" data-s="'+i+'">'+esc(lbl)+'</button>';
-    }
-    html += '<span class="scenario-note">当前显示：第 '+S+' 次通过的情形 · '+esc(meta.scenarioHint || '切换只影响本次查看')+'</span></div>';
     // Gantt card
     html += '<div class="card"><div class="card-head"><strong>'+esc(meta.cardTitlePrefix)+' · '+esc(monthYear(axisStart))+' — '+esc(monthYear(axisEnd))+'</strong><span>'+esc(meta.cardHeadNote)+'</span></div>';
     html += '<div class="scroll"><div class="gantt">';
@@ -558,6 +553,14 @@
       var manual = items.filter(function(t){ return !t.gen; });
       var secVoid = manual.length > 0 && manual.every(function(t){ return effStatus(t) === 'void'; });
       html += '<div class="group-head'+(secVoid?' void':'')+'"><div class="group-label">'+esc(sec.label)+' <small>· '+items.length+' '+esc(meta.itemUnit)+'</small>'+(secVoid?' <span class="status-tag">'+esc(SL.void || '已作废')+'</span>':'')+'</div><div class="group-track">'+gridlinesHTML()+todayLineHTML(false)+'</div></div>';
+      if(sec.id === 'exam'){
+        html += '<div class="exam-switch">';
+        for(var i = 1; i <= exam.exams.length; i++){
+          var lbl = exam.exams[i-1].label || (i <= CNT.length ? CNT[i-1]+'次通过' : '第'+i+'次通过');
+          html += '<button class="sc-btn'+(i===S?' active':'')+'" data-s="'+i+'">'+esc(lbl)+'</button>';
+        }
+        html += '</div>';
+      }
       if(sec.id === 'exam' && exam.registrationNote){
         html += '<div class="group-note">'+esc(exam.registrationNote)+'</div>';
       }
