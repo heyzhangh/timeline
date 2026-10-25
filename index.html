@@ -252,7 +252,7 @@
     // Header
     html += '<div class="topbar"><div class="topbar-right">';
     if(meta.titleFigure){ html += '<img class="title-figure" src="'+esc(meta.titleFigure)+'" alt="">'; }
-    html += '</div><h1>'+esc(meta.title)+'</h1><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
+    html += '</div><h1>'+esc(meta.title)+'</h1>'; if(meta.subtitle && meta.subtitle.trim()){ html += '<div class="subtitle">'+esc(meta.subtitle)+'</div>'; } html += '</div>';
     // Legend
     html += '<div class="legend">';
     sections.forEach(function(sec){
@@ -328,7 +328,7 @@
       html += '</ul></div>';
     }
     // Footer
-    html += '<div class="footer"><p><strong>'+esc(meta.footerTitle)+'</strong>'+esc(meta.footerText)+'</p></div>';
+    if((meta.footerTitle && meta.footerTitle.trim()) || (meta.footerText && meta.footerText.trim())){ html += '<div class="footer"><p><strong>'+esc(meta.footerTitle)+'</strong>'+esc(meta.footerText)+'</p></div>'; }
     if(meta.dataAsOf){
       html += '<div class="meta">'+esc(meta.snapshotLabel)+' '+esc(fmtCN(meta.dataAsOf))+'</div>';
     }
@@ -491,7 +491,7 @@
     // Header
     html += '<div class="topbar"><div class="topbar-right">';
     if(meta.titleFigure){ html += '<img class="title-figure" src="'+esc(meta.titleFigure)+'" alt="">'; }
-    html += '</div><h1>'+esc(meta.title)+'</h1><div class="subtitle">'+esc(meta.subtitle)+'</div></div>';
+    html += '</div><h1>'+esc(meta.title)+'</h1>'; if(meta.subtitle && meta.subtitle.trim()){ html += '<div class="subtitle">'+esc(meta.subtitle)+'</div>'; } html += '</div>';
     // Status strip: today / in-progress / next milestone (dynamic only).
     var doingNames = [];
     allRows.forEach(function(r){
@@ -612,7 +612,7 @@
       html += '</ul></div>';
     }
     // Footer
-    html += '<div class="footer"><p><strong>'+esc(meta.footerTitle)+'</strong>'+esc(meta.footerText)+'</p></div>';
+    if((meta.footerTitle && meta.footerTitle.trim()) || (meta.footerText && meta.footerText.trim())){ html += '<div class="footer"><p><strong>'+esc(meta.footerTitle)+'</strong>'+esc(meta.footerText)+'</p></div>'; }
     if(meta.dataAsOf){
       html += '<div class="meta">'+esc(meta.snapshotLabel)+' '+esc(fmtCN(meta.dataAsOf))+'</div>';
     }
